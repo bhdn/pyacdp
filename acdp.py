@@ -43,7 +43,7 @@ hours_modify_t = '<td align="left">%(project)s</td>\\n\\s*<td align="left">%(hou
 
 DEFAULT_HOST = os.environ.get("ACDP_URL", "https://acdp.mandriva.com.br/")
 
-DEBUG = os.environ.get("ACDP_DEBUG") != "" or False
+DEBUG = os.environ.get("ACDP_DEBUG", False) and True
 
 class ACDP:
     def __init__(self, host=DEFAULT_HOST):
