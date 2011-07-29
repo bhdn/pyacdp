@@ -18,7 +18,7 @@ import os
 import difflib
 import time
 
-CONFIGFILE = os.path.expanduser("~/.acdp")
+CONFIGFILE = os.environ.get("ACDP_CONF", os.path.expanduser("~/.acdp"))
 
 # regexps
 # login failure
@@ -41,9 +41,9 @@ hours_failure = re.compile('<span class="errormini">(.*)</span>')
 hours_modify_t = '<td align="left">%(project)s</td>\\n\\s*<td align="left">%(hours)s</td>\\n\\s*<td align="left">%(descr)s</td>\\n\\s*<td align="right"><form method="post" action="horas_projeto.php\?action=updatehrs&hours_id=(\\d+)"><input type="submit" name="updatehrs" value="Update"></form></td>'
 
 
-DEFAULT_HOST="https://acdp.mandriva.com.br/"
+DEFAULT_HOST = os.environ.get("ACDP_URL", "https://acdp.mandriva.com.br/")
 
-DEBUG=False
+DEBUG = os.environ.get("ACDP_DEBUG") != "" or False
 
 class ACDP:
     def __init__(self, host=DEFAULT_HOST):
