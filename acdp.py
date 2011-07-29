@@ -54,7 +54,6 @@ class ACDP:
         self.projects_rev_cache = {}
         self.person_id = None
         self.person_name = None
-        pass
 
     def login(self, login, passwd):
         """Login"""
