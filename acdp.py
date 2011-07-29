@@ -18,8 +18,7 @@ import os
 import difflib
 import time
 
-HOME=os.getenv("HOME", "")
-CONFIGFILE="%s/.acdp" % HOME
+CONFIGFILE = os.path.expanduser("~/.acdp")
 
 # regexps
 # login failure
