@@ -308,7 +308,7 @@ if __name__ == "__main__":
     print "Press ENTER to confirm or CTRL-C to abort.."
     try:
         res = raw_input()
-    except:
+    except KeyboardInterrupt:
         leave(name_in, name_out)
 
     # action
