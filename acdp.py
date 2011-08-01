@@ -281,7 +281,7 @@ if __name__ == "__main__":
     fd_out.close()
 
     # edit output file
-    editor = os.getenv("VISUAL")
+    editor = os.getenv("VISUAL", os.getenv("EDITOR"))
     if not editor:
         print "Error: VISUAL not defined, don't know what editor to use"
         leave(name_in, name_out, 1)
