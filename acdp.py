@@ -28,7 +28,7 @@ person_id_r = re.compile('name="person_id" value="(\d+)"')
 # person_name
 person_name_r = re.compile('name="person_name" value="(.*)"></center>Internal Hours')
 # month listing
-list_entry = re.compile('<tr class="row1">\n\s*<td align="center">(\d+)</td>\n\s*<td align="left">(.*)</td>\n\s*<td align="center">(\d+)</td>\n\s*<td align="left"></td>\n\s*<td align="left">(.*)</td>')
+list_entry = re.compile('<tr class="row[12]">\n\s*<td align="center">(\d+)</td>\n\s*<td align="left">(.*)</td>\n\s*<td align="center">(\d+)</td>\n\s*<td align="left"></td>\n\s*<td align="left">(.*)</td>')
 # project listing
 project_entry = re.compile('\?proj_id=(\d+)">(.*)</a>')
 # editable entry
