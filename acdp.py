@@ -58,7 +58,7 @@ class ACDP:
     def login(self, login, passwd):
         """Login"""
         # TODO: person_id, person_name
-        url = self.host + '/acdp/login.php'
+        url = self.host + 'login.php'
         params = urllib.urlencode({
             'action': 'login',
             'GoAheadAndLogIn': 'Login',
@@ -81,7 +81,7 @@ class ACDP:
 
     def list_hours(self, year, month):
         """Lists acdp hours"""
-        url = self.host + '/acdp/relatorio.php?action=personal_month&year=%(year)d&month=%(month)d' % ({'year': year, 'month': month})
+        url = self.host + 'relatorio.php?action=personal_month&year=%(year)d&month=%(month)d' % ({'year': year, 'month': month})
         params = urllib.urlencode({
             'detailed': '1'
             })
@@ -94,7 +94,7 @@ class ACDP:
 
     def list_recent(self):
         """Lists recent projects"""
-        url = self.host + '/acdp/horas_projeto.php?action=add'
+        url = self.host + 'horas_projeto.php?action=add'
         con = self.opener.open(url)
         res = con.read()
         res_nl = res.replace('<p>','\n<p>')
@@ -133,7 +133,7 @@ class ACDP:
             month = '0%s' % month
 
         # first lets get the hours id
-        url = self.host + "/acdp/relatorio.php?action=day&person_id=%s&report_day=%s&report_month=%s&report_year=%s" % (self.person_id, day, month, year)
+        url = self.host + "relatorio.php?action=day&person_id=%s&report_day=%s&report_month=%s&report_year=%s" % (self.person_id, day, month, year)
         con = self.opener.open(url)
         res = con.read()
         hours_modify_c = hours_modify_t % ({'descr': descr, 'hours': hours, 'project': self.projects_rev_cache[proj]})
@@ -149,7 +149,7 @@ class ACDP:
         print "hours_id: %s " % hours_id,
 
         # let the fun begin
-        url = self.host + '/acdp/horas_projeto.php?proj_id=%s' % proj
+        url = self.host + 'horas_projeto.php?proj_id=%s' % proj
         params = urllib.urlencode({
             'action': 'remove',
             'hours_id': hours_id,
@@ -171,7 +171,7 @@ class ACDP:
         month = str(month)
         if len(month) == 1:
             month = '0%s' % month
-        url = self.host + '/acdp/horas_projeto.php?proj_id=%s' % proj
+        url = self.host + 'horas_projeto.php?proj_id=%s' % proj
         params = urllib.urlencode({
             'find_single': '1',
             'action': 'add',
