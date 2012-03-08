@@ -223,7 +223,13 @@ def parse_options(args):
             "       %prog -c\n"
             "       %prog -p\n"
             "       %prog --help")
-    parser = optparse.OptionParser(usage=usage)
+    descr = """\
+This is a python interface for acdp.
+
+To use it, create a ~/.acdp file containing your my.mandriva login on first
+line, and optionally a password on the second.
+"""
+    parser = optparse.OptionParser(usage=usage, description=descr)
     parser.add_option("-c", "--current-month", default=False,
             action="store_true",
             help="Edits the current month")
