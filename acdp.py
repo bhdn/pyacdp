@@ -3,7 +3,8 @@
 # Python frontend for editing ACDP hours with your favorite editor
 # (discovered from VISUAL env)
 #
-# Copyright, (C) Eugeni Dodonov <eugeni@dodonov.net>, 2010
+# Copyright, (C) Eugeni Dodonov <eugeni@dodonov.net>, 2010, 2011, 2012
+#                Bogdano Arendartchuk <debogdano@gmail.com>, 2011, 2012
 #
 # Distributed under GPLv2 licence.
 #
