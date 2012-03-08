@@ -18,8 +18,10 @@ import sys
 import os
 import difflib
 import time
+import datetime
 import subprocess
 import getpass
+import optparse
 
 CONFIGFILE = os.environ.get("ACDP_CONF", os.path.expanduser("~/.acdp"))
 
@@ -216,6 +218,38 @@ def leave(name_in, name_out, retcode=0):
     os.unlink(name_out)
     sys.exit(retcode)
 
+def parse_options(args):
+    usage = ("%prog <month> <year>\n"
+            "       %prog -c\n"
+            "       %prog -p\n"
+            "       %prog --help")
+    parser = optparse.OptionParser(usage=usage)
+    parser.add_option("-c", "--current-month", default=False,
+            action="store_true",
+            help="Edits the current month")
+    parser.add_option("-p", "--previous-month", default=False,
+            action="store_true",
+            help="Edits the previous month")
+    opts, args = parser.parse_args(args)
+    used = sum((opts.current_month, opts.previous_month, bool(args)))
+    if used != 1 or (args and len(args) != 2):
+        parser.error("invalid arguments")
+    cur = datetime.date.today().replace(day=1)
+    if opts.current_month:
+        opts.month = cur.month
+        opts.year = cur.year
+    elif opts.previous_month:
+        prev = cur - datetime.timedelta(days=1)
+        opts.month = prev.month
+        opts.year = prev.year
+    else:
+        try:
+            opts.month = int(args[0])
+            opts.year = int(args[1])
+        except ValueError:
+            parser.error("invalid month specification")
+    return opts, args
+
 if __name__ == "__main__":
     acdp = ACDP()
     fd_in, name_in = tempfile.mkstemp(suffix='acdp')
@@ -225,12 +259,9 @@ if __name__ == "__main__":
     login = None
     passwd = None
 
-    if len(sys.argv) < 3:
-        print "Usage: %s <month> <year>" % sys.argv[0]
-        leave(name_in, name_out, 1)
-
-    month = int(sys.argv[1])
-    year = int(sys.argv[2])
+    opts, args = parse_options(sys.argv[1:])
+    month = opts.month
+    year = opts.year
 
     try:
         print "Trying to load authentication settings from %s" % CONFIGFILE
