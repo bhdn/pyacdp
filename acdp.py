@@ -18,6 +18,7 @@ import os
 import difflib
 import time
 import subprocess
+import getpass
 
 CONFIGFILE = os.environ.get("ACDP_CONF", os.path.expanduser("~/.acdp"))
 
@@ -234,13 +235,14 @@ if __name__ == "__main__":
         print "Trying to load authentication settings from %s" % CONFIGFILE
         if not os.path.exists(CONFIGFILE):
             print "Not found."
-            import getpass
             login = raw_input("My Mandriva account: ")
             passwd = getpass.getpass()
         else:
             fd = open(CONFIGFILE, "r")
             login = fd.readline().strip()
             passwd = fd.readline().strip()
+            if not passwd:
+                passwd = getpass.getpass("Password for %s: " % (login))
             fd.close()
     except:
         print "Error: please create %s, containing my.mandriva login on first line\nand password on 2nd" % CONFIGFILE
