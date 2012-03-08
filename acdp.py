@@ -17,6 +17,7 @@ import sys
 import os
 import difflib
 import time
+import subprocess
 
 CONFIGFILE = os.environ.get("ACDP_CONF", os.path.expanduser("~/.acdp"))
 
@@ -252,8 +253,17 @@ if __name__ == "__main__":
     recent_projects = acdp.list_recent()
     hours = acdp.list_hours(year, month)
 
+    cmdline = ["cal", str(month), str(year)]
+    try:
+        output = subprocess.check_output(cmdline, shell=False)
+    except subprocess.CalledProcessError, e:
+        sys.stderr.write("warning: command %r failed: %s\n" % (cmdline, e))
+    else:
+        fd_in.writelines(("# %s\n" % line) for line in output.splitlines())
+
     print >>fd_in, "# acdp data for %s / %s" % (month, year)
     print >>fd_in, "# cache of recent projects:"
+
     projects = {}
     for id, project in recent_projects:
         print >>fd_in, "# %s - %s" % (id, project)
