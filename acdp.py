@@ -37,7 +37,7 @@ list_entry = re.compile('<tr class="row[12]">\n\s*<td align="center">(\d+)</td>\
 # project listing
 project_entry = re.compile('\?proj_id=(\d+)">(.*)</a>')
 # editable entry
-pyacdp_entry = re.compile('(?P<op>[+-])\s+(?P<proj>\d+)\s*(?P<day>\d+(?:-\d+)?)\s*(?P<hours>\d+)\s*(?P<descr>.*)')
+pyacdp_entry = re.compile('(?P<op>[+-])\s+(?P<proj>\d+)\s*(?P<day>\d+(?:-\d+)?)\s*(?P<hours>\d+)\s*(?P<descr>.*)', re.M)
 # hours added
 hours_added = re.compile('Your hours were added successfully')
 # hours failure
@@ -60,6 +60,20 @@ class ACDP:
         self.person_id = None
         self.person_name = None
 
+    def pull_encoding(self, raw):
+        try:
+            u = raw.decode("latin-1")
+        except UnicodeError:
+            u = raw.decode("utf-8")
+        return u.encode("utf-8")
+
+    def push_encoding(self, raw):
+        try:
+            u = raw.decode("utf-8")
+        except UnicodeError:
+            u = raw.decode("latin-1")
+        return u.encode("latin-1")
+
     def login(self, login, passwd):
         """Login"""
         # TODO: person_id, person_name
@@ -71,7 +85,7 @@ class ACDP:
             'passwd': passwd
             })
         con = self.opener.open(url, params)
-        res = con.read()
+        res = self.pull_encoding(con.read())
         failure = login_failure.findall(res)
         if DEBUG:
             print res
@@ -83,7 +97,6 @@ class ACDP:
             print "NOT logged in"
             return False
 
-
     def list_hours(self, year, month):
         """Lists acdp hours"""
         url = self.host + 'relatorio.php?action=personal_month&year=%(year)d&month=%(month)d' % ({'year': year, 'month': month})
@@ -91,7 +104,7 @@ class ACDP:
             'detailed': '1'
             })
         con = self.opener.open(url, params)
-        res = con.read()
+        res = self.pull_encoding(con.read())
         if DEBUG:
             print res
         hours = list_entry.findall(res)
@@ -101,7 +114,7 @@ class ACDP:
         """Lists recent projects"""
         url = self.host + 'horas_projeto.php?action=add'
         con = self.opener.open(url)
-        res = con.read()
+        res = self.pull_encoding(con.read())
         res_nl = res.replace('<p>','\n<p>')
         if DEBUG:
             print res_nl
@@ -140,8 +153,9 @@ class ACDP:
         # first lets get the hours id
         url = self.host + "relatorio.php?action=day&person_id=%s&report_day=%s&report_month=%s&report_year=%s" % (self.person_id, day, month, year)
         con = self.opener.open(url)
-        res = con.read()
-        hours_modify_c = hours_modify_t % ({'descr': descr, 'hours': hours, 'project': self.projects_rev_cache[proj]})
+        res = self.pull_encoding(con.read())
+        hours_modify_c = hours_modify_t % ({'descr': descr,
+            'hours': hours, 'project': self.projects_rev_cache[proj]})
         if DEBUG:
             print hours_modify_c
         hours_modify_r = re.compile(hours_modify_c)
@@ -160,9 +174,8 @@ class ACDP:
             'hours_id': hours_id,
             })
         con = self.opener.open(url, params)
-        res = con.read()
+        res = self.pull_encoding(con.read())
         print "done"
-        pass
 
     def add(self, proj, year, month, day, hours, descr):
         """Add an entry"""
@@ -185,14 +198,14 @@ class ACDP:
             'person_id': self.person_id,
             'person_name': self.person_name,
             'horas': hours,
-            'hours_desc': descr,
+            'hours_desc': self.push_encoding(descr),
             'date_day': day,
             'date_month': month,
             'date_year': year,
             'detailed': '1'
             })
         con = self.opener.open(url, params)
-        res = con.read()
+        res = self.pull_encoding(con.read())
         success = hours_added.findall(res)
         if success:
             print 'success'
