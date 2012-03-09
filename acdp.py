@@ -37,7 +37,7 @@ list_entry = re.compile('<tr class="row[12]">\n\s*<td align="center">(\d+)</td>\
 # project listing
 project_entry = re.compile('\?proj_id=(\d+)">(.*)</a>')
 # editable entry
-pyacdp_entry = re.compile('(?P<op>[+-]) (?P<proj>\d+)\s*(?P<day>\d+(?:-\d+)?)\s*(?P<hours>\d+)\s*(?P<descr>.*)')
+pyacdp_entry = re.compile('(?P<op>[+-])\s+(?P<proj>\d+)\s*(?P<day>\d+(?:-\d+)?)\s*(?P<hours>\d+)\s*(?P<descr>.*)')
 # hours added
 hours_added = re.compile('Your hours were added successfully')
 # hours failure
