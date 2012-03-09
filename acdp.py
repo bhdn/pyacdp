@@ -37,7 +37,7 @@ list_entry = re.compile('<tr class="row[12]">\n\s*<td align="center">(\d+)</td>\
 # project listing
 project_entry = re.compile('\?proj_id=(\d+)">(.*)</a>')
 # editable entry
-pyacdp_entry = re.compile('([+-]) (\d+)\s*(\d+)\s*(\d+)\s*(.*)')
+pyacdp_entry = re.compile('(?P<op>[+-]) (?P<proj>\d+)\s*(?P<day>\d+(?:-\d+)?)\s*(?P<hours>\d+)\s*(?P<descr>.*)')
 # hours added
 hours_added = re.compile('Your hours were added successfully')
 # hours failure
@@ -363,8 +363,17 @@ if __name__ == "__main__":
 
     # action
     for op, proj, day, hours, descr in changes:
-        if op == '-':
-            acdp.remove(proj, year, month, day, hours, descr)
-        elif op == '+':
-            acdp.add(proj, year, month, day, hours, descr)
+        try:
+            rawfrom_, rawto_ = day.split("-", 1)
+            from_ = int(rawfrom_)
+            to_ = int(rawto_)
+        except ValueError:
+            days = [day]
+        else:
+            days = xrange(from_, to_ + 1)
+        for day in days:
+            if op == '-':
+                acdp.remove(proj, year, month, str(day), hours, descr)
+            elif op == '+':
+                acdp.add(proj, year, month, str(day), hours, descr)
     leave(name_in, name_out)
