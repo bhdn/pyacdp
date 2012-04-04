@@ -44,6 +44,15 @@ hours_added = re.compile('Your hours were added successfully')
 hours_failure = re.compile('<span class="errormini">(.*)</span>')
 # hours_modify_template
 hours_modify_t = '<td align="left">%(project)s</td>\\n\\s*<td align="left">%(hours)s</td>\\n\\s*<td align="left">%(descr)s</td>\\n\\s*<td align="right"><form method="post" action="horas_projeto.php\?action=updatehrs&hours_id=(\\d+)"><input type="submit" name="updatehrs" value="Update"></form></td>'
+# list of all projects
+project_list_r = re.compile(r"""<tr class="row[^"]+">
+<td><input type="checkbox" name="[^"]+" value="(?P<projid>[^"]+)"></td>
+<td>(?P<somecode>[^<]+)</td>
+<td>[^<]+</td>
+<td>[^<]+</td>
+<td>(?P<customer>[^<]+)</td>
+<td><a href="[^"]+">(?P<descr>[^<]+)</a> </td>
+</tr>""", re.M)
 
 
 DEFAULT_HOST = os.environ.get("ACDP_URL", "https://acdp.mandriva.com.br/")
@@ -62,9 +71,9 @@ class ACDP:
 
     def pull_encoding(self, raw):
         try:
-            u = raw.decode("latin-1")
-        except UnicodeError:
             u = raw.decode("utf-8")
+        except UnicodeError:
+            u = raw.decode("latin-1")
         return u.encode("utf-8")
 
     def push_encoding(self, raw):
@@ -136,6 +145,12 @@ class ACDP:
             self.projects_rev_cache[id] = project
         return projects
 
+    def list_projects(self):
+        url = self.host + "horas_projeto.php?but_find_project=Find+Project"
+        con = self.opener.open(url)
+        res = self.pull_encoding(con.read())
+        info = project_list_r.findall(res)
+        return info
 
     def remove(self, proj, year, month, day, hours, descr):
         """Remove an entry"""
@@ -303,6 +318,7 @@ if __name__ == "__main__":
     if not acdp.login(login, passwd):
         print "Unable to login."
         leave(name_in, name_out, 1)
+    all_projects = acdp.list_projects()
     recent_projects = acdp.list_recent()
     hours = acdp.list_hours(year, month)
 
@@ -335,6 +351,15 @@ if __name__ == "__main__":
             pid = acdp.projects_cache.get(project, '-1')
             print >>fd_in, "%s\t%s\t%s\t%s" % (pid, day, hours, descr)
         print >>fd_in
+
+    print >>fd_in, "\n" * 10
+    print >>fd_in, "# all projects"
+    print >>fd_in, "# %pid\tcustomer\tdescription"
+    for (pid, _, customer, descr) in all_projects:
+        # the customer fields are known to have many encoding problems:
+        print >>fd_in, "# %s\t%s\t%s" % (pid,
+                customer[:12].decode("ascii", "ignore"),
+                descr[:50].decode("ascii", "ignore"))
 
     # generate diffable files
     fd_in.close()
